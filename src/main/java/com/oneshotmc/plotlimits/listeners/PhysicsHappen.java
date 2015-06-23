@@ -28,6 +28,7 @@ import com.oneshotmc.plotlimits.util.ChatUtil;
 
 public class PhysicsHappen implements Listener {
 	PlotLimits plugin;
+	ConfigurationSection cs;
 	//String = worldName , ConfigMaterialStorage = Materials to search for in worldName
 	private HashMap<String,ConfigMaterialStorage> hm = new HashMap<String,ConfigMaterialStorage>();
 	public PhysicsHappen(PlotLimits plugin){
@@ -40,8 +41,8 @@ public class PhysicsHappen implements Listener {
 			}
 			
 		}, 20, 20);
+		cs = plugin.files.getConfigYML().getConfigurationSection("worlds");
 	}
-	ConfigurationSection cs = plugin.files.getConfigYML().getConfigurationSection("worlds");
 	public void setupConfig(){
 		for(String srt : cs.getKeys(false)){
 			ConfigurationSection cs2 = cs.getConfigurationSection(srt);

@@ -107,6 +107,7 @@ public class FileLoader {
 	}
 	
 	public static ConfigurationSection getWorldPerms(YamlConfiguration c, World world){
-		return c.getConfigurationSection(world.getName().toString());
+		return c.getConfigurationSection("worlds."+world.getName().toString());
+		
 	}
 }

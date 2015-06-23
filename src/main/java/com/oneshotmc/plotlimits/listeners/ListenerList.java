@@ -8,9 +8,8 @@ public class ListenerList {
 		this.plugin=plugin;
 	}
 	public void setupListners(){
-		new EntitySpawn(plugin);
+		EntitySpawn ES = new EntitySpawn(plugin);
+		ES.setup();
 		new RedstoneUse(plugin);
-		PhysicsHappen ph = new PhysicsHappen(plugin);
-		ph.setupConfig();
 	}
 }

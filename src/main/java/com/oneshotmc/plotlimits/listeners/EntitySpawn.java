@@ -28,21 +28,34 @@ import com.oneshotmc.plotlimits.util.ChatUtil;
 @SuppressWarnings("unused")
 public class EntitySpawn implements Listener {
 	private PlotLimits plugin;
-	private FileLoader files = plugin.getFiles();
-	private YamlConfiguration config = (YamlConfiguration) files.getConfigYML();
 	private PlotAPI api = new PlotAPI();
 	private EntityCount ec = new EntityCount();
+	FileLoader files;
+	YamlConfiguration config;
 	public EntitySpawn(PlotLimits plugin){
 		this.plugin=plugin;
+	}
+	public void setup(){
+		if(plugin==null){
+			System.out.println("WHY IS THE PLUGIN NULL!?!?! :o");
+		}
+		files = getPlugin().getFiles();
+		config = (YamlConfiguration) files.getConfigYML();
 		plugin.getServer().getPluginManager().registerEvents(this, plugin);
 	}
-	
 	@EventHandler (priority=EventPriority.HIGHEST,ignoreCancelled=true)
 	public void onSpawn(CreatureSpawnEvent e){
-		System.out.println("EmtitySpawned");
+		System.out.println("EntitySpawned");
 		Location loc = e.getLocation();
 		World world = loc.getWorld();
 		String worldName = world.getName().toString();
+		try{
+			if(config==null){
+				System.out.println("CONFIG NULL!");
+			}
+			if(FileLoader.getWorldPerms(config, world)==null){
+				System.out.println("FILE LOADER NULL!");
+			}
 		ConfigurationSection worldSettings = FileLoader.getWorldPerms(config, world).getConfigurationSection("entities");
 		Plot plotIn = api.getPlot(loc);
 		int maxTypeEntites=worldSettings.getInt("maxentities."+e.getEntityType().toString().toUpperCase());
@@ -57,7 +70,13 @@ public class EntitySpawn implements Listener {
 			ChatUtil.sendMessage(plotIn, ChatColor.BOLD+""+"You are spawning too many entites!",ChatType.WARNING);
 			e.setCancelled(true);
 		}
-		
+		}
+		catch(NullPointerException ex){
+			System.out.println("Y Null?");
+			//getWorldpermsIsNull?
+		}
 	}
-	
+	public PlotLimits getPlugin(){
+		return plugin;
+	}
 }

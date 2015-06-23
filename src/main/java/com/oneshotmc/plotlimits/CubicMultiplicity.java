@@ -32,8 +32,9 @@ public class CubicMultiplicity extends Cubic {
 	public int getMutiplicity(){
 		return multiplicity;
 	}
-	public void addOneMultiplicity(){
+	public int addOneMultiplicity(){
 		this.multiplicity++;
+		return multiplicity;
 	}
 	public void setMultiplicty(int num){
 		this.multiplicity=num;

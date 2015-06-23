@@ -58,18 +58,28 @@ public class RedstoneUse implements Listener{
 		if(e.getAction() == Action.RIGHT_CLICK_BLOCK){
 			Block block = e.getClickedBlock();
 			Material blockType = block.getType();
-			PlotId id = api.getPlot(block.getLocation()).getId();
+			PlotId id = null;
+			try{
+			id = api.getPlot(block.getLocation()).getId();
+			}
+			catch(NullPointerException ex){}
 			switch(blockType){
 			case WOOD_BUTTON :
 			case STONE_BUTTON :
 			case LEVER :
+				try{
 				cubiclist.get(id).getList(false).clear();
+				}
+				catch(NullPointerException exception){
+					//No need to clear
+					}
 				break;
 			default:
 				break;
 			}
 		}
 	}
+	@SuppressWarnings("deprecation")
 	@EventHandler (priority=EventPriority.HIGHEST,ignoreCancelled=true)
 	public void redstoneActivation(BlockRedstoneEvent e){
 		Block block = e.getBlock();
@@ -80,31 +90,50 @@ public class RedstoneUse implements Listener{
 		ConfigurationSection redstone = worldconfig.getConfigurationSection("redstone");
 		if(redstone==null)return;
 		Plot plot = api.getPlot(loc);
-		int CONFIGmaxClockRepeat = redstone.getInt("maxclockrepeat");
-		int CONFIGmaxredstone = redstone.getInt("maxredstonepercheck");
-		ArrayList<CubicMultiplicity> lis = cubiclist.get(plot.getId()).getList(true);
-		CubicMultiplicity cmu= getMultiplicity(lis, new Cubic(loc));
-		cmu.addOneMultiplicity();
-		int multiplicity = cmu.getMutiplicity();
-		int blocksWarnBefore=redstone.getInt("blocksbeforewarn");
-		if(CONFIGmaxClockRepeat<multiplicity){
-			ChatUtil.sendMessage(api.getPlot(loc), ChatColor.BOLD+"Too much redstone activity in your plot!", ChatType.WARNING);
-			e.setNewCurrent(e.getOldCurrent());
+		if(plot.getId()==null||plot==null){
+			plugin.getLogger().info("couldn't find plot");
 			return;
 		}
-		else if(CONFIGmaxredstone<getTotalMultiplicity(lis)){
-			for(Cubic c : lis){
+		int CONFIGmaxClockRepeat = redstone.getInt("maxclockrepeat");
+		int CONFIGmaxredstone = redstone.getInt("maxredstonepercheck");
+		int mul;
+		int totalm;
+		CubicMultiplicity cub;
+		CubicMultiplicityGrouper cmg;
+		ArrayList<CubicMultiplicity> list;
+
+		cmg = cubiclist.get(plot.getId());
+		if(cmg==null){
+			cubiclist.put(plot.getId(), new CubicMultiplicityGrouper());
+			cmg = cubiclist.get(plot.getId());
+		}
+		list = cmg.getList(true);
+		cub = getMultiplicity(list, new Cubic(loc));
+		mul = cub.addOneMultiplicity();
+		totalm = getTotalMultiplicity(list);
+
+		int blocksWarnBefore=redstone.getInt("blocksbeforewarn");
+		if(CONFIGmaxClockRepeat<mul){
+			System.out.println(Material.getMaterial(e.getOldCurrent()));
+			ChatUtil.sendMessage(api.getPlot(loc), ChatColor.BOLD+"Too much redstone clock activity in your plot!", ChatType.WARNING);
+			turnOffRedstone(loc);
+			cub.setMultiplicty(0);
+			return;
+		}
+		else if(CONFIGmaxredstone<totalm){
+			for(CubicMultiplicity c : list){
 				Location newLocation = new Location(world,c.getX(),c.getY(),c.getZ());
 				turnOffRedstone(newLocation);
+				c.setMultiplicty(0);
 			}
 			ChatUtil.sendMessage(api.getPlot(loc), ChatColor.BOLD+"Too much redstone activity in your plot!", ChatType.WARNING);
 			return;
 		}
-		else if(CONFIGmaxredstone<getTotalMultiplicity(lis)-blocksWarnBefore || CONFIGmaxClockRepeat<multiplicity - blocksWarnBefore){
+		else if(CONFIGmaxredstone- blocksWarnBefore==getTotalMultiplicity(list) || CONFIGmaxClockRepeat- blocksWarnBefore==mul){
+			
 			ChatUtil.sendMessage(plot, "You have almost reached your max clock repeat amount!", ChatType.WARNING);
 			return;
 		}
-		
 	}
 	public CubicMultiplicity getMultiplicity(ArrayList<CubicMultiplicity> list1, Cubic cm){
 		
@@ -125,10 +154,10 @@ public class RedstoneUse implements Listener{
 	public void turnOffRedstone(Location loca){
 		Block block = loca.getBlock();
 		Material mat = block.getType();
-		switch(mat){
-		case DIODE_BLOCK_OFF:
+		block.setType(Material.COAL_ORE);
+		/*switch(mat){
 		case DIODE_BLOCK_ON:
-			loca.getBlock().setType(Material.DIODE_BLOCK_OFF);
+			loca.getBlock().setType(Material.SAND);
 			break;
 		case REDSTONE_BLOCK:
 			loca.getBlock().setType(Material.COAL);
@@ -143,6 +172,19 @@ public class RedstoneUse implements Listener{
 			break;
 		default:
 			break;
+		
+		}
+		*/
+	}
+	public boolean isPowered(Material mater){
+		switch(mater){
+		case DIODE_BLOCK_ON:
+		case REDSTONE_BLOCK:
+		case REDSTONE_LAMP_ON:
+		case REDSTONE_TORCH_ON:
+			return true;
+		default:
+			return false;
 		}
 	}
 }
