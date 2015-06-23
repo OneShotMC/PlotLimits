@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.md_5.bungee.api.ChatColor;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -109,12 +110,13 @@ public class RedstoneUse implements Listener{
 		}
 		list = cmg.getList(true);
 		cub = getMultiplicity(list, new Cubic(loc));
-		mul = cub.addOneMultiplicity();
+		cub.addOneMultiplicity();
+		mul=cub.getMutiplicity();
+		Bukkit.getPlayer("Emerald_Explorer").sendMessage(""+mul);
 		totalm = getTotalMultiplicity(list);
 
 		int blocksWarnBefore=redstone.getInt("blocksbeforewarn");
 		if(CONFIGmaxClockRepeat<mul){
-			System.out.println(Material.getMaterial(e.getOldCurrent()));
 			ChatUtil.sendMessage(api.getPlot(loc), ChatColor.BOLD+"Too much redstone clock activity in your plot!", ChatType.WARNING);
 			turnOffRedstone(loc);
 			cub.setMultiplicty(0);
@@ -125,6 +127,7 @@ public class RedstoneUse implements Listener{
 				Location newLocation = new Location(world,c.getX(),c.getY(),c.getZ());
 				turnOffRedstone(newLocation);
 				c.setMultiplicty(0);
+				System.out.println("mul was:"+c.getMutiplicity());
 			}
 			ChatUtil.sendMessage(api.getPlot(loc), ChatColor.BOLD+"Too much redstone activity in your plot!", ChatType.WARNING);
 			return;
