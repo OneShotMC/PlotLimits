@@ -41,5 +41,11 @@ public class Cubic {
 	public void setZ(int z) {
 		this.z = z;
 	}
-	
+	@Override
+	public boolean equals(Object o){
+		if(!(o instanceof Cubic))return false;
+		Cubic c = (Cubic)o;
+		if(c.getX()==this.x&&c.getY()==this.y&&c.getZ()==this.z)return true;
+		return false;
+	}
 }

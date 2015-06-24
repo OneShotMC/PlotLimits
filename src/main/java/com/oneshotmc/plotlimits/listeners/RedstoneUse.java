@@ -50,7 +50,7 @@ public class RedstoneUse implements Listener{
 				}
 			}
 			
-		}, 6, 6);
+		}, 12, 12);
 	}
 	HashMap<PlotId,CubicMultiplicityGrouper> cubiclist= new HashMap<PlotId,CubicMultiplicityGrouper>();
 	
@@ -80,10 +80,11 @@ public class RedstoneUse implements Listener{
 			}
 		}
 	}
-	@SuppressWarnings("deprecation")
-	@EventHandler (priority=EventPriority.HIGHEST,ignoreCancelled=true)
+	@EventHandler (priority=EventPriority.HIGHEST,ignoreCancelled=false)
 	public void redstoneActivation(BlockRedstoneEvent e){
 		Block block = e.getBlock();
+		//possible fix
+		if(block.isBlockPowered()){
 		Location loc = block.getLocation();
 		World world = loc.getWorld();
 		ConfigurationSection worldconfig =  FileLoader.getWorldPerms((YamlConfiguration) plugin.getConfig(), world);
@@ -137,6 +138,7 @@ public class RedstoneUse implements Listener{
 			ChatUtil.sendMessage(plot, "You have almost reached your max clock repeat amount!", ChatType.WARNING);
 			return;
 		}
+		}
 	}
 	public CubicMultiplicity getMultiplicity(ArrayList<CubicMultiplicity> list1, Cubic cm){
 		
@@ -157,7 +159,7 @@ public class RedstoneUse implements Listener{
 	public void turnOffRedstone(Location loca){
 		Block block = loca.getBlock();
 		Material mat = block.getType();
-		block.setType(Material.COAL_ORE);
+		block.setType(Material.AIR);
 		/*switch(mat){
 		case DIODE_BLOCK_ON:
 			loca.getBlock().setType(Material.SAND);
