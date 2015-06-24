@@ -5,7 +5,7 @@ A bukkit plugin dependent of PlotSquared, that will allow you to restrict player
 - Rapid redstone clocks
 - Too much redstone at once
 - Entity limits (supports different limits for different entites)
-- 
+
 
 #Compilation
 Requirments: Install GitBash, Java and Apache Maven
