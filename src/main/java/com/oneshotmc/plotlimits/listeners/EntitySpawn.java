@@ -58,8 +58,12 @@ public class EntitySpawn implements Listener {
 			}
 		ConfigurationSection worldSettings = FileLoader.getWorldPerms(config, world).getConfigurationSection("entities");
 		Plot plotIn = api.getPlot(loc);
-		int maxTypeEntites=worldSettings.getInt("maxentities."+e.getEntityType().toString().toUpperCase());
+		int maxTypeEntites=1000;
+		if(worldSettings.contains("maxentities."+e.getEntityType().toString().toUpperCase())){
+		maxTypeEntites=worldSettings.getInt("maxentities."+e.getEntityType().toString().toUpperCase());
+		}
 		int totMaxEntities = worldSettings.getInt("maxentities.total");
+		
 		int typeEntity = ec.entitiesInPlot(loc, e.getEntityType());
 		if(typeEntity>totMaxEntities){
 			ChatUtil.sendMessage(plotIn, ChatColor.BOLD+""+"You are spawning too many entites!",ChatType.WARNING);
