@@ -1,6 +1,0 @@
-name : PlotLimits
-description : Prevent plot abusers and limit events that can happen in plots
-author: Emerald_Explorer
-main: com.oneshotmc.plotlimits.PlotLimits
-version: ${version}
-softdepend: [PlotSquared]
