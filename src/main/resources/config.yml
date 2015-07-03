@@ -1,0 +1,22 @@
+worlds:
+  cannon:
+    entities:
+      # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/entity/EntityType.html
+      maxentities:
+        GHAST: 0
+        ENDER_DRAGON: 0
+        WITHER : 1
+        total: 15
+    physics:
+      # https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+      materials:
+      - SAND
+      - ANVIL
+      - GRAVEL
+    redstone: 
+      blocksclockbeforewarn: 10
+      blocksbeforewarn: 200
+      maxclockrepeat : 40
+      maxredstonepercheck : 2000
+    
+      
