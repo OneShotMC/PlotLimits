@@ -104,7 +104,16 @@ public class RedstoneUse implements Listener{
 		Block block = e.getBlock();
 		Material type = block.getType();
 		//possible fix
-		if(type!=Material.REDSTONE_COMPARATOR&&e.getOldCurrent() == 0){
+		switch(type){
+			case REDSTONE_COMPARATOR:
+			case REDSTONE_COMPARATOR_OFF:
+			case REDSTONE_COMPARATOR_ON:
+				return;
+			default:
+		}
+		int oldCurrent = e.getOldCurrent();
+		int newCurrent = e.getNewCurrent();
+		if(oldCurrent!=0/*||newCurrent==0*/)return;
 		Location loc = block.getLocation();
 		World world = loc.getWorld();
 		ConfigurationSection worldconfig =  FileLoader.getWorldPerms((YamlConfiguration) plugin.getConfig(), world);
@@ -134,15 +143,14 @@ public class RedstoneUse implements Listener{
 		cub = getMultiplicity(list, new Cubic(loc));
 		cub.addOneMultiplicity();
 		mul=cub.getMutiplicity();
-		plugin.getLogger().info(""+mul);
-		totalm = getTotalMultiplicity(list);
+		//totalm = getTotalMultiplicity(list);
 
 		int CLOCKblocksWarnBefore=redstone.getInt("blocksclockbeforewarn");
 		int MAINblocksWarnBefore = redstone.getInt("blocksbeforewarn");
 		//If the multiplicity (how many times the redstone has been triggered in a row) is greater than the max amount set in the config
-		if(CONFIGmaxClockRepeat<mul){
+		if(CONFIGmaxClockRepeat<=mul){
 			//See if the main message has been sent already. isMainMessageSent is manually changed to false after 20 game ticks to prevent spamming
-			if(!(cmg.isMainMessageSent())){
+			if(!(cmg.isMainMessageSent())&&mul==CONFIGmaxClockRepeat){
 			ChatUtil.sendMessage(api.getPlot(loc), ChatColor.BOLD+"Too much redstone clock activity in your plot!", ChatType.WARNING);
 			//Tell the object that holds information about the plots redstone events that a message has been sent.  
 			cmg.setMainMessageSent(true);
@@ -162,11 +170,10 @@ public class RedstoneUse implements Listener{
 			}
 			//Clear the current of the redstone so it can't power anything else
 			e.setNewCurrent(0);
-			//Set the multiplicity to 0 so it won't try to clear redstone even after it has already been done.
-			cub.setMultiplicty(0);
 			return;
 		}
 		//If the config amount for blocksbeforewarn is less than the TOTAL amount of redstone used continuously stop all redstone in the plot.
+		/*
 		else if(CONFIGmaxredstone<totalm){
 			for(CubicMultiplicity c : list){
 				Location newLocation = new Location(world,c.getX(),c.getY(),c.getZ());
@@ -190,12 +197,12 @@ public class RedstoneUse implements Listener{
 			}
 			return;
 		}
-		else if(!(cmg.isWarnMessageSent())&&(CONFIGmaxredstone- CLOCKblocksWarnBefore==getTotalMultiplicity(list) || CONFIGmaxClockRepeat- MAINblocksWarnBefore==mul)){
+		*/
+		else if(!(cmg.isWarnMessageSent())&&(/*CONFIGmaxredstone- CLOCKblocksWarnBefore==getTotalMultiplicity(list) || */CONFIGmaxClockRepeat- MAINblocksWarnBefore==mul)){
 			
 			ChatUtil.sendMessage(plot, "You have almost reached your max clock repeat amount!", ChatType.WARNING);
 			cmg.setWarnMessageSent(true);
 			return;
-		}
 		}
 	}
 	public CubicMultiplicity getMultiplicity(ArrayList<CubicMultiplicity> list1, Cubic cm){

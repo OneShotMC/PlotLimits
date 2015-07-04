@@ -14,9 +14,9 @@ worlds:
       - ANVIL
       - GRAVEL
     redstone: 
-      blocksclockbeforewarn: 4
+      blocksclockbeforewarn: 10
       blocksbeforewarn: 200
-      maxclockrepeat : 20
+      maxclockrepeat : 40
       maxredstonepercheck : 2000
     
       
