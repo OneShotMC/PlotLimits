@@ -2,30 +2,27 @@ package com.oneshotmc.plotlimits.listeners;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
+import java.util.UUID;
 
 import net.md_5.bungee.api.ChatColor;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.Dispenser;
-import org.bukkit.block.Sign;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.material.RedstoneWire;
-
-
-import org.bukkit.material.Wool;
 
 import com.intellectualcrafters.plot.api.PlotAPI;
 import com.intellectualcrafters.plot.object.Plot;
@@ -112,23 +109,25 @@ public class RedstoneUse implements Listener{
 			default:
 		}
 		int oldCurrent = e.getOldCurrent();
-		int newCurrent = e.getNewCurrent();
 		if(oldCurrent!=0/*||newCurrent==0*/)return;
 		Location loc = block.getLocation();
+		Plot plot = api.getPlot(loc);
 		World world = loc.getWorld();
 		ConfigurationSection worldconfig =  FileLoader.getWorldPerms((YamlConfiguration) plugin.getConfig(), world);
 		if(worldconfig==null)return;
 		ConfigurationSection redstone = worldconfig.getConfigurationSection("redstone");
 		if(redstone==null)return;
-		Plot plot = api.getPlot(loc);
 		if(plot.getId()==null||plot==null){
 			plugin.getLogger().info("couldn't find plot");
 			return;
 		}
+		
+		HashSet<UUID> hashset= plot.getOwners();
+		UUID playerUUID = (UUID) hashset.toArray()[0];
+		Player player = Bukkit.getPlayer(playerUUID);
+		if(player.hasPermission("plotlimits.bypass.redstone"))return;
 		int CONFIGmaxClockRepeat = redstone.getInt("maxclockrepeat");
-		int CONFIGmaxredstone = redstone.getInt("maxredstonepercheck");
 		int mul;
-		int totalm;
 		CubicMultiplicity cub;
 		CubicMultiplicityGrouper cmg;
 		ArrayList<CubicMultiplicity> list;
@@ -145,7 +144,6 @@ public class RedstoneUse implements Listener{
 		mul=cub.getMutiplicity();
 		//totalm = getTotalMultiplicity(list);
 
-		int CLOCKblocksWarnBefore=redstone.getInt("blocksclockbeforewarn");
 		int MAINblocksWarnBefore = redstone.getInt("blocksbeforewarn");
 		//If the multiplicity (how many times the redstone has been triggered in a row) is greater than the max amount set in the config
 		if(CONFIGmaxClockRepeat<=mul){
@@ -221,7 +219,6 @@ public class RedstoneUse implements Listener{
 		}
 		return m;
 	}
-	@SuppressWarnings("deprecation")
 	public void turnOffRedstone(Location loca){
 		Block block = loca.getBlock();
 		Material mat = block.getType();
@@ -243,6 +240,8 @@ public class RedstoneUse implements Listener{
 			block.setType(Material.REDSTONE_TORCH_OFF);
 			break;
 		case REDSTONE_WIRE:
+			break;
+		default:
 			break;
 			/*
 			block.setType(Material.SIGN);

@@ -4,3 +4,15 @@ author: Emerald_Explorer
 main: com.oneshotmc.plotlimits.PlotLimits
 version: ${version}
 softdepend: [PlotSquared]
+permissions:
+  plotlimits.bypass.*:
+    description: Give access to all bypass perms
+    children:
+      plotlimits.bypass.redstone: true
+      plotlimits.bypass.entities: true
+      plotlimits.bypass.physics: true
+  plotlimits.admin:
+    descriptionL have access to admin commands
+    default: op
+      
+      
